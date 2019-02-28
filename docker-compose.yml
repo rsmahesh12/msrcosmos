@@ -1,0 +1,8 @@
+version: '2'
+services:
+  apache:
+   image: tnhnclskn/apache2
+   container_name: apache_web
+   restart: always
+   ports:
+     - "8080:80"

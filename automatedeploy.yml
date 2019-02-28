@@ -1,0 +1,34 @@
+---
+ - hosts: docker
+   tasks:
+
+     - name: check the status of image
+       shell: docker ps -a
+
+     - name: Run the existing created container
+       add_host:
+          name: apache_web
+          ansible_connection: docker
+       changed_when: false
+
+     - name: run command in container
+       delegate_to: apache_web
+       raw: bash
+
+
+
+     - name: Install wget
+       package: name=wget state=present
+
+     - name: Download file from git
+       git:
+        repo: 'https://github.com/rsmahesh12/demotest.git'
+        dest: /var/www/html
+
+     - name: check whether the folder structure exists
+       stat:
+         path: /var/www/html
+
+
+     - name: Copy the downloaded file to the folder structure
+       command: docker cp /var/www/html/test.html eadc5047f151:/var/www/html

@@ -1,0 +1,34 @@
+---
+ - hosts: dev
+   tasks:
+    - name: Install packages for the servers
+      apt: name={{ item }} state=installed
+      with_items:
+          - docker
+          - docker-compose
+          - openssl
+          - git
+          - curl
+          - build-essential
+          - libssl-dev
+      when: ansible_pkg_mgr == "apt"
+
+
+    - name: Install nvm
+      shell: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+      args:
+        creates: "{{ansible_env.HOME}}/.nvm/nvm.sh"
+        chdir: ~/.nvm
+
+    - name: unarchieve node
+      unarchive:
+          src: /etc/ansible/node-v8.12.0-linux-x64.tar.xz
+          dest: /root
+          remote_src: yes
+      become: yes
+
+
+    - name: install node
+      shell: apt update && apt install nodejs -y
+      register: node
+    - debug: msg={{node}}

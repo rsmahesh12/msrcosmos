@@ -1,0 +1,60 @@
+---
+ - hosts: db
+ 
+   tasks: 
+     - name: updating the apt-get cache
+	   apt:
+	   update-cache: yes
+	   become: yes
+	   become_method: sudo
+	  
+	 - name: Install repositories
+	   shell: apt-get install software-properties-common -y
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: Add the ppa key
+	   shell: add-apt-repository ppa:couchdb/stable -y
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: update the package
+	   shell: apt-get update
+	   
+	 - name: Remove existing couchdb
+	   shell: apt-get remove couchdb couchdb-bin couchdb-common -yf
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: Install couchDB
+	   shell: apt-get install couchdb -y
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: securing couchDB
+	   shell: stop couchdb
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: Change the ownership
+	   shell: chown -R couchdb:couchdb /usr/lib/couchdb /usr/share/couchdb /etc/couchdb /usr/bin/couchdb
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: Change the permissions
+	   shell: chmod -R 0770 /usr/lib/couchdb /usr/share/couchdb /etc/couchdb /usr/bin/couchdb
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: Start db
+	   shell: start couchdb
+	   become: yes
+	   become_method: sudo
+	   
+	 - name: Accessing futon GUI of Couch DB
+           shell: sh -L 5984:18.196.100.46:5984 sai@your_server_ip	 
+	   
+	 - debug message with each package
+         - debug: 
+             msg: "{{item}}"
+           with_items: "{{packages}}"
